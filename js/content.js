@@ -48,7 +48,7 @@ ext.addCustomFunction('OpenSelectors',(request)=>
 
 
 			console.log('A has ', hrefs );
-			ext.sendCustomRequest
+			ext.executeOnServer
 			(
 				'OpenLinks'
 				,{ links : hrefs }

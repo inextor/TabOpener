@@ -6,13 +6,13 @@ var window_id	= -1;
 var maxTabs		= -1;
 var toCloseTabs	= {};
 
-ext.addCustomRequestListener('RegisterWindow',(urlRequest,request)=>
+ext.addListener('RegisterWindow',(urlRequest,request)=>
 {
 	console.log('Registering window');
 	window_id		= request.window_id;
 });
 
-ext.addCustomRequestListener('OpenLinks',(urlRequest,request)=>
+ext.addListener('OpenLinks',(urlRequest,request)=>
 {
 	console.log('Open links',request);
 	//window_id		= request.window_id;

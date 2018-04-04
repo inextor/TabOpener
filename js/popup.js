@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function()
 
 	chrome.windows.getCurrent((w)=>
 	{
-		ext.sendCustomRequest('RegisterWindow', { window_id : w.id	});
+		ext.executeOnBackground('RegisterWindow', { window_id : w.id	});
 	});
 
 
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function()
 
 		if( links.length > 0 )
 		{
-			ext.sendCustomRequest('OpenLinks',{links: links});
+			ext.executeOnBackground('OpenLinks',{links: links});
 		}
 	});
 
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function()
 	{
 
 		Util.stopEvent( evt );
-		ext.sendCustomRequestToClient('OpenSelectors',{ selector: Util.getById('inputSelector').value })
+		ext.executeOnClients('OpenSelectors',{ selector: Util.getById('inputSelector').value })
 		.then((response)=>
 		{
 			console.log('Send succesfully');
