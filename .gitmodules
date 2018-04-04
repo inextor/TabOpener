@@ -1,0 +1,3 @@
+[submodule "modules/ExtensionFramework"]
+	path = modules/ExtensionFramework
+	url = git@github.com:inextor/ExtensionFramework.git
