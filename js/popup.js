@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function()
 		{
 			if( links[i].trim() === '')
 			{
-				links.splice(i,1);
+				links.splice( i ,1 );
 			}
 		}
 
