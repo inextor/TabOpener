@@ -7,13 +7,13 @@ document.addEventListener('DOMContentLoaded', function()
 	if( currentSelector !== null )
 		Util.getById('inputSelector').value  = currentSelector;
 
-	var ext = new ExtensionFrameworkClient();
+	var ext = new Client();
 
 	chrome.windows.getCurrent((w)=>
 	{
-		ext.sendCustomRequest('register_window', { window_id : w.id	});
+		ext.sendCustomRequest('RegisterWindow', { window_id : w.id	});
 	});
-	
+
 
 	Util.getById('urlSubmit').addEventListener('click',(evt)=>
 	{
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function()
 
 		if( links.length > 0 )
 		{
-			ext.sendCustomRequest('open_links',{links: links});
+			ext.sendCustomRequest('OpenLinks',{links: links});
 		}
 	});
 
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function()
 	{
 
 		Util.stopEvent( evt );
-		ext.sendCustomRequestToClient('openSelectors',{ selector: Util.getById('inputSelector').value })
+		ext.sendCustomRequestToClient('OpenSelectors',{ selector: Util.getById('inputSelector').value })
 		.then((response)=>
 		{
 			console.log('Send succesfully');
@@ -66,4 +66,3 @@ document.addEventListener('DOMContentLoaded', function()
 
 	});
 });
-

@@ -1,6 +1,6 @@
 var ext =  new ExtensionFrameworkClient();
 
-ext.addCustomFunction('openSelectors',(request)=>
+ext.addCustomFunction('OpenSelectors',(request)=>
 {
 	if( request !== undefined && typeof request.selector !== "undefined" && request.selector.trim() !== "" )
 	{
@@ -50,7 +50,7 @@ ext.addCustomFunction('openSelectors',(request)=>
 			console.log('A has ', hrefs );
 			ext.sendCustomRequest
 			(
-				'open_links'
+				'OpenLinks'
 				,{ links : hrefs }
 			)
 			.then(()=>
@@ -68,5 +68,4 @@ ext.addCustomFunction('openSelectors',(request)=>
 		}
 	}
 	console.log( 'Open link by Selector',request );
-	return Promise.resolve(1);
 });

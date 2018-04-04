@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Getting Started Extension's Popup</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src="modules/ExtensionFramework/Client.js"></script>
+		<script src="js/WebUtils.js"></script>
+		<script src="js/popup.js"></script>
+		<link rel="stylesheet" href="css/popup.css" charset="utf-8">
+	</head>
+	<body>
+		<header>
+			<a href="#" data-open-section="open-by-list">Open List</a>
+			<a href="#" data-open-section="open-by-selector">Open by Selector</a>
+			<a href="#" data-open-section="settings">Settings</a>
+		</header>
+		<div data-section="open-by-list"  class="hidden">
+			<textarea id="urlInput" style="overflow:scroll;max-height:400px;min-height:400px;height:400;"></textarea>
+			<a href="#" id="urlSubmit">Open</a>
+		</div>
+		<div data-section="open-by-selector" class="">
+			<input type="text" id="inputSelector" value="">
+			<a href="#" id="openSelector">Load</a>
+		</div>
+		<div id="sectionSettings" data-section="settings" class="hidden" >
+			<form id="settingsForm">
+				<label>Close Tabs Seconds (0 for never) <input type="text" id="#secondsToClose"></label>
+				<label></label>
+				<label>Maximun Tabs<input id="maxTabs" value=10><br>
+				<a href="#" id="saveSettings">Submit</a>
+			</form>
+		</div>
+	</body>
+</html>

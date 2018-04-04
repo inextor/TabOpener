@@ -1,4 +1,4 @@
-var ext			= new ExtensionFrameworkServer();
+var ext			= new Server();
 
 var toOpenLinks	= [];
 var intervalId	= -1;
@@ -6,13 +6,13 @@ var window_id	= -1;
 var maxTabs		= -1;
 var toCloseTabs	= {};
 
-ext.addCustomRequestListener('register_window',(urlRequest,request)=>
+ext.addCustomRequestListener('RegisterWindow',(urlRequest,request)=>
 {
 	console.log('Registering window');
 	window_id		= request.window_id;
 });
 
-ext.addCustomRequestListener('open_links',(urlRequest,request)=>
+ext.addCustomRequestListener('OpenLinks',(urlRequest,request)=>
 {
 	console.log('Open links',request);
 	//window_id		= request.window_id;
@@ -42,14 +42,14 @@ function openNewTabs()
 			return;
 
 		var url = toOpenLinks.shift();
-		if( url === undefined ) 
+		if( url === undefined )
 			return;
 
 		var index = tabs.length > 0 ? tabs.length-1 : 0;
 
 		chrome.tabs.create({ url: url , windowId : window_id, active: false, index: index },(tab)=>
 		{
-			if( secondsToCloseNewOpenTabs > 0 )		
+			if( secondsToCloseNewOpenTabs > 0 )
 			{
 				ext.addPageLoadListener(url, false,()=>
 				{
