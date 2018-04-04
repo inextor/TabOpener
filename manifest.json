@@ -1,0 +1,17 @@
+{
+	"manifest_version": 2
+	,"name": "Tab Opener"
+	,"description": "Open a list o links or a selector of links in tabs"
+	,"version": "1.0"
+	,"background":
+	{
+	  "scripts"		:["modules/ExtensionFramework/Server.js","js/background.js"]
+	  ,"persistent"	:false
+	}
+	,"content_scripts":
+	[
+	  	{ "matches":["<all_urls>"] ,"js":["modules/ExtensionFramework/Client.js","js/content.js"]}
+	]
+	,"browser_action":{ "default_icon": "icon.png" ,"default_popup": "popup.html" }
+	,"permissions": [ "tabs","<all_urls>"]
+}
