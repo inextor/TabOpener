@@ -11,23 +11,26 @@
 	<body>
 		<header>
 			<a href="#" data-open-section="open-by-list">Open List</a>
-			<a href="#" data-open-section="open-by-selector">Open by Selector</a>
+			<a href="#" data-open-section="open-by-selector" class="active">Open by Selector</a>
 			<a href="#" data-open-section="settings">Settings</a>
 		</header>
+
 		<div data-section="open-by-list"  class="hidden">
-			<textarea id="urlInput" style="overflow:scroll;max-height:400px;min-height:400px;height:400;"></textarea>
-			<a href="#" id="urlSubmit">Open</a>
+			<textarea id="urlInput" style="overflow:scroll;max-height:400px;min-height:200px;height:400;"></textarea>
+			<a href="#" id="urlSubmit" class="button">Open</a>
 		</div>
+
 		<div data-section="open-by-selector" class="">
 			<input type="text" id="inputSelector" value="">
-			<a href="#" id="openSelector">Load</a>
+			<a href="#" id="openSelector" class="button">Load</a>
 		</div>
+
 		<div id="sectionSettings" data-section="settings" class="hidden" >
 			<form id="settingsForm">
 				<label>Close Tabs Seconds (0 for never) <input type="text" id="#secondsToClose"></label>
 				<label></label>
-				<label>Maximun Tabs<input id="maxTabs" value=10><br>
-				<a href="#" id="saveSettings">Submit</a>
+				<label>Maximun Tabs<input type="text" id="maxTabs" value=10><br>
+				<a href="#" id="saveSettings" class="button">Submit</a>
 			</form>
 		</div>
 	</body>

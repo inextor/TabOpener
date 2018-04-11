@@ -40,7 +40,11 @@ document.addEventListener('DOMContentLoaded', function()
 	{
 		anchor.addEventListener('click',(evt)=>
 		{
+			anchorSections.forEach((a)=>a.classList.remove('active') );
+			anchor.classList.add('active');
+
 			let sections = Array.from(Util.getAll('[data-section]'));
+
 			sections.forEach((section)=>
 			{
 				section.classList.add('hidden');
@@ -64,5 +68,15 @@ document.addEventListener('DOMContentLoaded', function()
 
 		localStorage.setItem('selector', Util.getById('inputSelector').value  );
 
+	});
+
+	Util.getById('saveSettings').addEventListener('click',(evt)=>
+	{
+		Util.stopEvent( evt );
+		let request  = {};
+
+		request.close_after = parseInt( UtilgetById('secondsToClose'),10 );
+		request.max_tabs 	= parseInt( UtilgetById('maxTabs'),10 );
+		ext.executeOnBackground('SaveSettings', request );
 	});
 });
