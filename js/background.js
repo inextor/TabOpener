@@ -1,13 +1,14 @@
 var ext			= new Server();
 
-var toOpenLinks	= [];
-var intervalId	= -1;
-var window_id	= -1;
-var toCloseTabs	= {};
+var toOpenLinks					= [];
+var intervalId					= -1;
+var window_id					= -1;
+var toCloseTabs					= {};
+var secondsToCloseNewOpenTabs	= 0;
 
 var settings	=
 {
-	max_tabs	: 5 
+	max_tabs	: 2
 	,cloase_after	: 0
 };
 
@@ -35,7 +36,7 @@ if( s )
 	}
 	catch(e)
 	{
-		console.log( e );
+		console.error( e );
 	}
 }
 
@@ -43,37 +44,43 @@ ext.addListener('SaveSettings',(urlRequest, request)=>
 {
 	if( request )
 	{
-		if( typeof request.max_tabs !== "undefined" && !isNaN( request.max_tabs ) )
+		if(request.max_tabs && typeof request.max_tabs !== "undefined" && !isNaN( request.max_tabs ) )
 		{
 			settings.max_tabs = request.max_tabs;
 		}
 
-		if( typeof request.close_after !== "undefined" && !isNaN( request.close_after ) )
+		if(request.close_after && typeof request.close_after !== "undefined" && !isNaN( request.close_after ) )
 		{
 			settings.close_after = request.close_after;
 		}
-	}
+		else
+		{
+			settings.close_after = 0;
+		}
 
+		localStorage.setItem('settings', JSON.stringify( settings ) );
+	}
 });
+
 
 ext.addListener('RegisterWindow',(urlRequest,request)=>
 {
-	console.log('Registering window');
+	//console.log('Registering window');
 	window_id		= request.window_id;
 });
 
 ext.addListener('OpenLinks',(urlRequest,request)=>
 {
-	console.log('Open links',request);
+	//console.log('Open links',request);
 	//window_id		= request.window_id;
-	
+
 	request.links.forEach((link)=>
 	{
 		toOpenLinks.push( link );
 	});
 
 	if( intervalId === -1 )
-		intervalId = setInterval( openNewTabs, 1000 );
+		intervalId = setInterval( openNewTabs, 200 );
 
 	//settings.max_tabs	= 5;
 	//console.log('Close the tab id but not yet because we are debugingd');
@@ -97,9 +104,9 @@ function openNewTabs()
 		if( url === undefined || url.trim() === "" )
 			return;
 
-		var index = 0;//tabs.length > 0 ? tabs.length-1 : 0;
+		var index = tabs.length > 0 ? tabs.length-1 : 0;
 
-		chrome.tabs.create({ url: url , windowId : window_id, active: false, index: index },(tab)=>
+		chrome.tabs.create({ url: url , windowId : window_id, active: true, index: index },(tab)=>
 		{
 			if( secondsToCloseNewOpenTabs > 0 )
 			{

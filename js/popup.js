@@ -42,6 +42,8 @@ document.addEventListener('DOMContentLoaded', function()
 		{
 			anchorSections.forEach((a)=>a.classList.remove('active') );
 			anchor.classList.add('active');
+			let settings	= '[data-open-section="'+anchor.getAttribute('data-open-section')+'"]';
+			localStorage.setItem('tabSettings', settings );
 
 			let sections = Array.from(Util.getAll('[data-section]'));
 
@@ -72,11 +74,34 @@ document.addEventListener('DOMContentLoaded', function()
 
 	Util.getById('saveSettings').addEventListener('click',(evt)=>
 	{
-		Util.stopEvent( evt );
+		//Util.stopEvent( evt );
 		let request  = {};
 
-		request.close_after = parseInt( UtilgetById('secondsToClose'),10 );
-		request.max_tabs 	= parseInt( UtilgetById('maxTabs'),10 );
+		request.close_after = parseInt( Util.getById('secondsToClose').value,10 );
+		request.max_tabs 	= parseInt( Util.getById('maxTabs').value,10 );
 		ext.executeOnBackground('SaveSettings', request );
 	});
+
+
+	let tabSettings = localStorage.getItem('tabSettings');
+
+	if( tabSettings !== null )
+	{
+		document.querySelector( tabSettings ).click();
+	}
+
+	try
+	{
+		let settings = JSON.parse( localStorage.getItem('settings') );
+		if( settings )
+		{
+			Util.getById('secondsToClose').value = settings.close_after;
+			Util.getById('maxTabs').value = settings.max_tabs;
+		}
+	}
+	catch(e)
+	{
+		console.log('error',e);
+	}
+
 });

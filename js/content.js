@@ -1,6 +1,6 @@
-var ext =  new ExtensionFrameworkClient();
+var ext =  new Client();
 
-ext.addCustomFunction('OpenSelectors',(request)=>
+ext.addListener('OpenSelectors',(request)=>
 {
 	if( request !== undefined && typeof request.selector !== "undefined" && request.selector.trim() !== "" )
 	{
