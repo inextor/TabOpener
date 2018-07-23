@@ -92,8 +92,15 @@ function openNewTabs()
 	{
 		clearInterval( intervalId );
 		intervalId = -1;
+		chrome.browserAction.setBadgeText({text: ""});
 		return;
 	}
+
+	if( toOpenLinks.length > 999 )
+		chrome.browserAction.setBadgeText({text: "1k+"});
+	else
+		chrome.browserAction.setBadgeText({text: ''+toOpenLinks.length });
+
 
 	chrome.tabs.query({ windowId: window_id },(tabs)=>
 	{
