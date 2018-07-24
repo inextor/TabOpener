@@ -1,6 +1,0 @@
-[submodule "modules/ExtensionFramework"]
-	path = modules/ExtensionFramework
-	url = git@github.com:inextor/ExtensionFramework.git
-[submodule "modules/WebUtil"]
-	path = modules/WebUtil
-	url = git@github.com:inextor/WebUtil.git
