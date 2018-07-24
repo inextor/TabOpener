@@ -1,15 +1,8 @@
 
 var gulp			= require('gulp');
-var sass 			= require('gulp-sass');
-var autoprefixer	= require('gulp-autoprefixer');
-var minifyCss		= require('gulp-minify-css');
-var rename			= require('gulp-rename');
 var del				= require('del');
-var htmlmin			= require('gulp-htmlmin');
 var concat 			= require('gulp-concat');
 var mergeStream		= require('merge-stream');
-var closureCompiler = require('google-closure-compiler').gulp();
-
 
 gulp.task('default', ['html' ,'css' ,'scripts' ,'images' ,'watch','manifest','node_modules']);
 
@@ -28,35 +21,26 @@ gulp.task('watch',()=>
 gulp.task('node_modules',()=>
 {
 	let extension = gulp.src(['./node_modules/extension-framework/*.js'])
-		.pipe(gulp.dest('./dist/js/extension-framework/') );
+		.pipe(gulp.dest('./dist/js/ExtensionFramework/') );
 
 	let utils = gulp.src(['./node_modules/promiseutil/*.js'])
-		.pipe(gulp.dest('./dist/js/Promise-Utils/') );
+		.pipe(gulp.dest('./dist/js/PromiseUtils/') );
 
-	return mergeStream( extension, utils );
+	let dbts	= gulp.src(['./node_modules/diabetes/Utils.js'])
+		.pipe(gulp.dest('./dist/js/Diabetes/') );
+
+	return mergeStream( extension, utils, dbts );
 });
-
-
-gulp.task('framework',()=>
-{
-	return gulp.src(['./node_modules/extension-framework/*.js','./node_modules/promiseutil/*.js'])
-	.pipe(gulp.dest('./dist/js/extension-framework/') );
-});
-
 
 gulp.task('manifest',()=>
 {
-	return gulp.src(['./manifest.json'])
+	return gulp.src(['./manifest.json','./icon.png'])
 	.pipe(gulp.dest('./dist/') );
 });
 
 gulp.task('html',()=>
 {
 	return gulp.src(['./popup.html'])
- 		.pipe(htmlmin({
-			collapseWhitespace	: true
-			,removeComments		: true
-		}))
 		.pipe(gulp.dest('./dist/'));
 });
 
@@ -68,20 +52,8 @@ gulp.task('images',()=>
 
 gulp.task('css', function () {
 
-
 	let sassStream = gulp
-    	.src('./css/*.scss')
-    	.pipe(sass())
-		.pipe(concat('sass-files.css'));
-
-	let cssStream = gulp.src('./css/*.css')
-		.pipe(concat('css-files.css'));
-
-	return mergeStream( cssStream, sassStream )
-		.pipe( concat('styles.css' ) )
-    	.pipe( autoprefixer() )
-		.pipe( minifyCss() )
-    	.pipe(rename({suffix: '.min'}))
+    	.src('./css/*.css')
 		.pipe( gulp.dest('./dist/css/') );
 
 });
@@ -92,7 +64,6 @@ gulp.task('scripts', function()
 {
 	let dependencies =
 	[
-		'./node_modules/extension-framework/*.js'
 		,'./js/*.js'
 	];
 
