@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function()
 	var currentSelector = localStorage.getItem('selector');
 
 	if( currentSelector !== null )
-		Util.getById('inputSelector').value  = currentSelector;
+		Utils.getById('inputSelector').value  = currentSelector;
 
 	var ext = new Client();
 
@@ -15,11 +15,11 @@ document.addEventListener('DOMContentLoaded', function()
 	});
 
 
-	Util.getById('urlSubmit').addEventListener('click',(evt)=>
+	Utils.getById('urlSubmit').addEventListener('click',(evt)=>
 	{
-		Util.stopEvent( evt );
+		Utils.stopEvent( evt );
 
-		var links = Util.getById('urlInput').value.split('\n');
+		var links = Utils.getById('urlInput').value.split('\n');
 
 		for(var i=links.length-1;i>=0;i--)
 		{
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function()
 		}
 	});
 
-	let anchorSections	= Array.from( Util.getAll('[data-open-section]') );
+	let anchorSections	= Array.from( Utils.getAll('[data-open-section]') );
 	anchorSections.forEach((anchor)=>
 	{
 		anchor.addEventListener('click',(evt)=>
@@ -45,41 +45,42 @@ document.addEventListener('DOMContentLoaded', function()
 			let settings	= '[data-open-section="'+anchor.getAttribute('data-open-section')+'"]';
 			localStorage.setItem('tabSettings', settings );
 
-			let sections = Array.from(Util.getAll('[data-section]'));
+			let sections = Array.from(Utils.getAll('[data-section]'));
 
 			sections.forEach((section)=>
 			{
 				section.classList.add('hidden');
 			});
 
-			let openSection = Util.getFirst('[data-section="'+anchor.getAttribute('data-open-section')+'"]');
+			let openSection = Utils.getFirst('[data-section="'+anchor.getAttribute('data-open-section')+'"]');
 			openSection.classList.remove('hidden');
 		});
 	});
 
-	Util.getById('openSelector').addEventListener('click',(evt)=>
+	Utils.getById('openSelector').addEventListener('click',(evt)=>
 	{
 
-		Util.stopEvent( evt );
-		ext.executeOnClients('OpenSelectors',{ selector: Util.getById('inputSelector').value })
+		Utils.stopEvent( evt );
+		ext.executeOnClients('OpenSelectors',{ selector: Utils.getById('inputSelector').value })
 		.then((response)=>
 		{
 			console.log('Send succesfully');
 		})
 		.catch((e)=>{ console.error( e );});
 
-		localStorage.setItem('selector', Util.getById('inputSelector').value  );
+		localStorage.setItem('selector', Utils.getById('inputSelector').value  );
 
 	});
 
-	Util.getById('saveSettings').addEventListener('click',(evt)=>
+	Utils.getById('saveSettings').addEventListener('click',(evt)=>
 	{
-		//Util.stopEvent( evt );
+		//Utils.stopEvent( evt );
 		let request  = {};
 
 		request.close_after = parseInt( Util.getById('secondsToClose').value,10 );
 		request.max_tabs 	= parseInt( Util.getById('maxTabs').value,10 );
 		request.request_focus = Util.getById('request_focus').checked ? true : false;
+>>>>>>> 7a93458c9d9ea24dff4cb4bc891aeb9b9d9d7f69
 		ext.executeOnBackground('SaveSettings', request );
 	});
 
