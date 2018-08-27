@@ -2,7 +2,7 @@
 	"manifest_version": 2
 	,"name": "Tab Opener"
 	,"description": "Open a list o links or a selector of links in tabs"
-	,"version": "1.0"
+	,"version": "1.2"
 	,"background":
 	{
 	  "scripts"		:["js/PromiseUtils/PromiseUtils.js","js/ExtensionFramework/Server.js","js/background.js"]
