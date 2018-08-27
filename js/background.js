@@ -10,6 +10,7 @@ var settings	=
 {
 	max_tabs	: 2
 	,cloase_after	: 0
+	,request_focus	: 0
 };
 
 
@@ -32,6 +33,8 @@ if( s )
 			{
 				settings.close_after = obj.close_after;
 			}
+
+			settings.request_focus = 'request_focus' in obj && obj.request_focus ? true : false;
 		}
 	}
 	catch(e)
@@ -58,10 +61,16 @@ ext.addListener('SaveSettings',(urlRequest, request)=>
 			settings.close_after = 0;
 		}
 
+		settings.request_focus = 'request_focus' in request && request.request_focus ? true : false;
+
 		localStorage.setItem('settings', JSON.stringify( settings ) );
 	}
 });
 
+ext.addListener('ClearQueue',(urlRequest, request )=>
+{
+	toOpenLinks.splice(0,toOpenLinks.length );
+});
 
 ext.addListener('RegisterWindow',(urlRequest,request)=>
 {
@@ -96,10 +105,20 @@ function openNewTabs()
 		return;
 	}
 
-	if( toOpenLinks.length > 999 )
-		chrome.browserAction.setBadgeText({text: "1k+"});
-	else
+	if( toOpenLinks.length < 999 )
+	{
 		chrome.browserAction.setBadgeText({text: ''+toOpenLinks.length });
+	}
+	else if( toOpenLinks.length > 999 && toOpenLinks.length<10000)
+	{
+		let n = (toOpenLinks.length/1000);
+		let s = n.toFixed( 1 )+"k";
+		chrome.browserAction.setBadgeText({text: s});
+	}
+	else
+	{
+		chrome.browserAction.setBadgeText({text: "10k+"});
+	}
 
 
 	chrome.tabs.query({ windowId: window_id },(tabs)=>
@@ -113,7 +132,7 @@ function openNewTabs()
 
 		var index = tabs.length > 0 ? tabs.length-1 : 0;
 
-		chrome.tabs.create({ url: url , windowId : window_id, active: true, index: index },(tab)=>
+		chrome.tabs.create({ url: url , windowId : window_id, active: settings.request_focus , index: index },(tab)=>
 		{
 			if( secondsToCloseNewOpenTabs > 0 )
 			{
