@@ -79,7 +79,13 @@ document.addEventListener('DOMContentLoaded', function()
 
 		request.close_after = parseInt( Util.getById('secondsToClose').value,10 );
 		request.max_tabs 	= parseInt( Util.getById('maxTabs').value,10 );
+		request.request_focus = Util.getById('request_focus').checked ? true : false;
 		ext.executeOnBackground('SaveSettings', request );
+	});
+
+	Util.getById('clearQueue').addEventListener('click',(evt)=>
+	{
+		ext.executeOnBackground('ClearQueue', {});
 	});
 
 
@@ -93,10 +99,13 @@ document.addEventListener('DOMContentLoaded', function()
 	try
 	{
 		let settings = JSON.parse( localStorage.getItem('settings') );
+
 		if( settings )
 		{
 			Util.getById('secondsToClose').value = settings.close_after;
 			Util.getById('maxTabs').value = settings.max_tabs;
+
+			Util.getById('request_focus').checked = 'request_focus' in settings && settings.request_focus;
 		}
 	}
 	catch(e)
