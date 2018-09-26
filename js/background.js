@@ -4,6 +4,7 @@ var toOpenLinks					= [];
 var intervalId					= -1;
 var window_id					= -1;
 var toCloseTabs					= {};
+var windows						= {};
 var secondsToCloseNewOpenTabs	= 0;
 
 var settings	=
@@ -83,13 +84,22 @@ ext.addListener('OpenLinks',(urlRequest,request)=>
 	//console.log('Open links',request);
 	//window_id		= request.window_id;
 
+	if( !(request.window_id in  windows) )
+	{
+		windows[ request.window_id ] = {
+			'links': []
+			,'window_id': request.window_id
+			,'max_tabs': settings.max_tabs
+		};
+	}
+
 	request.links.forEach((link)=>
 	{
-		toOpenLinks.push( link );
+		windows[ request.window_id ].links.push( link );
 	});
 
 	if( intervalId === -1 )
-		intervalId = setInterval( openNewTabs, 200 );
+		intervalId = setInterval( openNewTabs, 750 );
 
 	//settings.max_tabs	= 5;
 	//console.log('Close the tab id but not yet because we are debugingd');
@@ -97,7 +107,15 @@ ext.addListener('OpenLinks',(urlRequest,request)=>
 
 function openNewTabs()
 {
-	if( toOpenLinks.length === 0 )
+
+	let total = 0;
+
+	for(let  i in windows )
+	{
+		total += windows[i].links.length;
+	}
+
+	if( total === 0 )
 	{
 		clearInterval( intervalId );
 		intervalId = -1;
@@ -105,42 +123,70 @@ function openNewTabs()
 		return;
 	}
 
-	if( toOpenLinks.length < 999 )
+	let ot= {};
+	for( let i in windows )
 	{
-		chrome.browserAction.setBadgeText({text: ''+toOpenLinks.length });
-	}
-	else if( toOpenLinks.length > 999 && toOpenLinks.length<10000)
-	{
-		let n = (toOpenLinks.length/1000);
-		let s = n.toFixed( 1 )+"k";
-		chrome.browserAction.setBadgeText({text: s});
-	}
-	else
-	{
-		chrome.browserAction.setBadgeText({text: "10k+"});
+		ot[ windows[ i ].window_id ] =  getOpenTabs( windows[ i ].window_id );
 	}
 
+	total = 0;
 
-	chrome.tabs.query({ windowId: window_id },(tabs)=>
+	PromiseUtils.all( ot ).then(( open_tabs )=>
 	{
-		if( settings.max_tabs > 0 && tabs.length >= settings.max_tabs )
-			return;
-
-		var url = toOpenLinks.shift();
-		if( url === undefined || url.trim() === "" )
-			return;
-
-		var index = tabs.length > 0 ? tabs.length-1 : 0;
-
-		chrome.tabs.create({ url: url , windowId : window_id, active: settings.request_focus , index: index },(tab)=>
+		try{
+		for( let window_id in open_tabs  )
 		{
-			if( secondsToCloseNewOpenTabs > 0 )
+			if( !( window_id in windows) )
+				continue;
+
+			total += windows[ window_id ].links.length;
+
+			if( windows[ window_id ].max_tabs > open_tabs[ window_id ] )
 			{
-				ext.addPageLoadListener(url, false,()=>
+				let index	= open_tabs[ window_id ] < 2 ? 1 : open_tabs[ window_id ] -1;
+				let url 	= windows[ window_id ].links.shift();
+
+				if( url === undefined )
+					continue;
+
+				let w_id = parseInt( window_id );
+
+				chrome.tabs.create({ url: url , windowId : w_id, active: settings.request_focus , index: index },(tab)=>
 				{
-					setTimeout(()=>{ chrome.tabs.remove( tab.id,()=>{ }); },secondsToCloseNewOpenTabs*1000 );
+					if( secondsToCloseNewOpenTabs > 0 )
+					{
+						ext.addPageLoadListener(url, false,()=>
+						{
+							setTimeout(()=>{ chrome.tabs.remove( tab.id,()=>{ }); },secondsToCloseNewOpenTabs*1000 );
+						});
+					}
 				});
 			}
+		}
+		}catch(e){
+
+			console.log( e );
+		}
+
+		if( total < 10000 )
+		{
+			chrome.browserAction.setBadgeText({text: ''+total });
+		}
+		else
+		{
+			chrome.browserAction.setBadgeText({text: "10k+"});
+		}
+	});
+}
+
+function getOpenTabs( window_id )
+{
+	return new Promise((resolve, reject)=>
+	{
+		chrome.tabs.query({ windowId: window_id },(tabs)=>
+		{
+			resolve( tabs.length );
 		});
 	});
 }
+
