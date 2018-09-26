@@ -19,20 +19,31 @@ document.addEventListener('DOMContentLoaded', function()
 	{
 		Utils.stopEvent( evt );
 
-		var links = Utils.getById('urlInput').value.split('\n');
-
-		for(var i=links.length-1;i>=0;i--)
+		chrome.windows.getCurrent((w)=>
 		{
-			if( links[i].trim() === '')
+			var links = Utils.getById('urlInput').value.split('\n');
+
+			for(var i=links.length-1;i>=0;i--)
 			{
-				links.splice( i ,1 );
+				if( links[i].trim() === '')
+				{
+					links.splice( i ,1 );
+				}
 			}
-		}
 
-		if( links.length > 0 )
-		{
-			ext.executeOnBackground('OpenLinks',{links: links});
-		}
+			if( links.length > 0 )
+			{
+				//chrome.windows.getCurrent((w)=>
+				//{
+				//	ext.executeOnBackground('RegisterWindow', { window_id : w.id	});
+				//});
+
+				ext.executeOnBackground('OpenLinks',{ links: links, window_id: w.id });
+			}
+
+		//ext.executeOnBackground('RegisterWindow', { window_id : w.id	});
+		});
+
 	});
 
 	let anchorSections	= Array.from( Utils.getAll('[data-open-section]') );
@@ -60,7 +71,10 @@ document.addEventListener('DOMContentLoaded', function()
 	Utils.getById('openSelector').addEventListener('click',(evt)=>
 	{
 
+
 		Utils.stopEvent( evt );
+
+
 		ext.executeOnClients('OpenSelectors',{ selector: Utils.getById('inputSelector').value })
 		.then((response)=>
 		{
@@ -77,14 +91,13 @@ document.addEventListener('DOMContentLoaded', function()
 		//Utils.stopEvent( evt );
 		let request  = {};
 
-		request.close_after = parseInt( Util.getById('secondsToClose').value,10 );
-		request.max_tabs 	= parseInt( Util.getById('maxTabs').value,10 );
-		request.request_focus = Util.getById('request_focus').checked ? true : false;
->>>>>>> 7a93458c9d9ea24dff4cb4bc891aeb9b9d9d7f69
+		request.close_after = parseInt( Utils.getById('secondsToClose').value,10 );
+		request.max_tabs 	= parseInt( Utils.getById('maxTabs').value,10 );
+		request.request_focus = Utils.getById('request_focus').checked ? true : false;
 		ext.executeOnBackground('SaveSettings', request );
 	});
 
-	Util.getById('clearQueue').addEventListener('click',(evt)=>
+	Utils.getById('clearQueue').addEventListener('click',(evt)=>
 	{
 		ext.executeOnBackground('ClearQueue', {});
 	});
@@ -103,10 +116,10 @@ document.addEventListener('DOMContentLoaded', function()
 
 		if( settings )
 		{
-			Util.getById('secondsToClose').value = settings.close_after;
-			Util.getById('maxTabs').value = settings.max_tabs;
+			Utils.getById('secondsToClose').value = settings.close_after;
+			Utils.getById('maxTabs').value = settings.max_tabs;
 
-			Util.getById('request_focus').checked = 'request_focus' in settings && settings.request_focus;
+			Utils.getById('request_focus').checked = 'request_focus' in settings && settings.request_focus;
 		}
 	}
 	catch(e)
