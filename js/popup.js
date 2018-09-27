@@ -88,13 +88,18 @@ document.addEventListener('DOMContentLoaded', function()
 
 	Utils.getById('saveSettings').addEventListener('click',(evt)=>
 	{
-		//Utils.stopEvent( evt );
-		let request  = {};
 
-		request.close_after = parseInt( Utils.getById('secondsToClose').value,10 );
-		request.max_tabs 	= parseInt( Utils.getById('maxTabs').value,10 );
-		request.request_focus = Utils.getById('request_focus').checked ? true : false;
-		ext.executeOnBackground('SaveSettings', request );
+		chrome.windows.getCurrent((w)=>
+		{
+			//Utils.stopEvent( evt );
+			let request  = {};
+
+			request.close_after = parseInt( Utils.getById('secondsToClose').value,10 );
+			request.max_tabs 	= parseInt( Utils.getById('maxTabs').value,10 );
+			request.request_focus = Utils.getById('request_focus').checked ? true : false;
+			request.window_id	= w.id;
+			ext.executeOnBackground('SaveSettings', request );
+		});
 	});
 
 	Utils.getById('clearQueue').addEventListener('click',(evt)=>

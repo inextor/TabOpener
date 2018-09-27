@@ -51,6 +51,12 @@ ext.addListener('SaveSettings',(urlRequest, request)=>
 		if(request.max_tabs && typeof request.max_tabs !== "undefined" && !isNaN( request.max_tabs ) )
 		{
 			settings.max_tabs = request.max_tabs;
+
+			if( request.window_id && window_id in windows )
+			{
+				windows[ window_id ].max_tabs = request.max_tabs;
+			}
+
 		}
 
 		if(request.close_after && typeof request.close_after !== "undefined" && !isNaN( request.close_after ) )
@@ -63,7 +69,6 @@ ext.addListener('SaveSettings',(urlRequest, request)=>
 		}
 
 		settings.request_focus = 'request_focus' in request && request.request_focus ? true : false;
-
 		localStorage.setItem('settings', JSON.stringify( settings ) );
 	}
 });
