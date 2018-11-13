@@ -75,7 +75,8 @@ ext.addListener('SaveSettings',(urlRequest, request)=>
 
 ext.addListener('ClearQueue',(urlRequest, request )=>
 {
-	toOpenLinks.splice(0,toOpenLinks.length );
+	//toOpenLinks.splice(0,toOpenLinks.length );
+	windows = {};
 });
 
 ext.addListener('RegisterWindow',(urlRequest,request)=>
