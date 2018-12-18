@@ -196,3 +196,19 @@ function getOpenTabs( window_id )
 	});
 }
 
+
+// For simple requests:
+chrome.runtime.onMessageExternal.addListener(
+  (request, sender, sendResponse)=> {
+		if( 'max_tabs' in request && !isNaN(request.max_tabs) )
+		{
+			if( request.max_tabs >=0 && request.max_tabs <= 20 )
+			{
+				chrome.tabs.query({ windowId: window_id },(tabs)=>
+				{
+					windows[ window_id ].max_tabs = request.max_tabs;
+				});
+			}
+		}
+	}
+);
