@@ -198,17 +198,30 @@ function getOpenTabs( window_id )
 
 
 // For simple requests:
-chrome.runtime.onMessageExternal.addListener(
-  (request, sender, sendResponse)=> {
-		if( 'max_tabs' in request && !isNaN(request.max_tabs) )
+chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse)=>
+{
+	if( 'max_tabs' in request && !isNaN(request.max_tabs) )
+	{
+		if( request.max_tabs >=0 && request.max_tabs <= 20 )
 		{
-			if( request.max_tabs >=0 && request.max_tabs <= 20 )
+			chrome.tabs.query({ windowId: window_id },(tabs)=>
 			{
-				chrome.tabs.query({ windowId: window_id },(tabs)=>
-				{
-					windows[ window_id ].max_tabs = request.max_tabs;
-				});
-			}
+				windows[ request.window_id ].max_tabs = request.max_tabs;
+			});
 		}
 	}
-);
+	if( 'open' in request && Array.isArray( request.open ) )
+	{
+		if( 'window_id' in request )
+		{
+			if( !(request.window_id in windows) )
+				windows[ request.window_id ] = { window_id: request.window_id, links:[], max_tabs: 2, request_focus: false};
+
+			windows[ request.window_id ].links.push( ...request.open );
+
+			if( intervalId === -1 )
+				intervalId = setInterval( openNewTabs, 750 );
+		}
+
+	}
+});
