@@ -56,10 +56,9 @@ ext.addListener('SaveSettings',(urlRequest, request)=>
 			{
 				windows[ window_id ].max_tabs = request.max_tabs;
 			}
-
 		}
 
-		if(request.close_after && typeof request.close_after !== "undefined" && !isNaN( request.close_after ) )
+		if( request.close_after && typeof request.close_after !== "undefined" && !isNaN( request.close_after ) )
 		{
 			settings.close_after = request.close_after;
 		}
@@ -204,24 +203,69 @@ chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse)=>
 	{
 		if( request.max_tabs >=0 && request.max_tabs <= 20 )
 		{
-			chrome.tabs.query({ windowId: window_id },(tabs)=>
-			{
-				windows[ request.window_id ].max_tabs = request.max_tabs;
-			});
+			if( 'windowId' in  sender && sender.windowId in windows )
+				windows[ sender.windowId ].max_tabs = request.max_tabs;
 		}
 	}
+
 	if( 'open' in request && Array.isArray( request.open ) )
 	{
-		if( 'window_id' in request )
+
+		Promise.resolve().then(()=>
 		{
-			if( !(request.window_id in windows) )
-				windows[ request.window_id ] = { window_id: request.window_id, links:[], max_tabs: 2, request_focus: false};
+			if( 'windowId' in sender )
+			{
+				return Promise.resolve( sender.windowId );
+			}
 
+			if( 'window_id' in request )
+				return request.window_id;
+
+
+			let less = -1;
+			let less_id = -1;
+
+			for( let i in windows )
+			{
+				if( windows[ i ].links.length < less || less == -1 )
+				{
+					less_id = i;
+					less = windows[i].links.length;
+				}
+			}
+
+			if( less_id !== -1 )
+				return Promise.resolve( less_id );
+
+			return new Promise((resolve,reject)=>
+			{
+				chrome.tabs.query({ },( tabArray )=>
+            	{
+					resolve( tabArray[ 0 ].windowId );
+            	});
+			});
+		}).then(( current_window )=>
+		{
+			if( !(current_window in windows) )
+			{
+				windows[ request.window_id ] = { window_id: current_window, links:[], max_tabs: 2, request_focus: false};
+			}
+
+			return Promise.resolve( current_window );
+		})
+		.then((current_window)=>
+		{
 			windows[ request.window_id ].links.push( ...request.open );
-
+			return Promise.resolve(true);
+		})
+		.then(()=>
+		{
 			if( intervalId === -1 )
 				intervalId = setInterval( openNewTabs, 750 );
-		}
-
+		})
+		.catch((error)=>
+		{
+			console.log('Error', error );
+		});
 	}
 });
