@@ -1,73 +1,91 @@
-
 var gulp			= require('gulp');
 var del				= require('del');
 var concat 			= require('gulp-concat');
-var mergeStream		= require('merge-stream');
 
-gulp.task('default', ['html' ,'css' ,'scripts' ,'images' ,'watch','manifest','node_modules']);
 
-gulp.task('watch',()=>
+function watch_task(cb)
 {
-	console.log('Default');
-  	gulp.watch( [ './css/*.scss' ] ,['css'] );
-  	gulp.watch ( ['./js/*.js' ] ,['scripts']);
-	gulp.watch ( [ 'manifest.json' ], ['manifest'] );
-	gulp.watch(['./html/*.html','./index.html'],['html']);
-	gulp.watch(['./html/*.html','./index.html'],['html']);
-	gulp.watch(['./node_modules/extension-framework/*.js','./node_modules/promiseutil/*.js'],['node_modules']);
-});
+	console.log( 'watch');
+	gulp.watch([ './css/*.scss'
+		, './js/*.js'
+		, 'manifest.json'
+		, './html/*.html'
+		,'./index.html'
+		,'./node_modules/extension-framework/*.js'
+		,'./node_modules/promiseutil/*.js' ], gulp.series( css_task, script_task, manifest_task, html_task, node_modules_task ) );
+	cb();
+}
 
-
-gulp.task('node_modules',()=>
+function ef_task(cb)
 {
-	let extension = gulp.src(['./node_modules/extension-framework/*.js'])
+	console.log( 'ef');
+	gulp.src(['./node_modules/extension-framework/*.js'])
 		.pipe(gulp.dest('./dist/js/ExtensionFramework/') );
 
-	let utils = gulp.src(['./node_modules/promiseutil/*.js'])
+	cb();
+}
+function pu_task(cb)
+{
+	console.log( 'pu');
+	gulp.src(['./node_modules/promiseutil/*.js'])
 		.pipe(gulp.dest('./dist/js/PromiseUtils/') );
-
-	let dbts	= gulp.src(['./node_modules/diabetes/Utils.js'])
+	cb();
+}
+function diabetes_task(cb)
+{
+	console.log( 'diabetes');
+	gulp.src(['./node_modules/diabetes/Utils.js'])
 		.pipe(gulp.dest('./dist/js/Diabetes/') );
 
-	return mergeStream( extension, utils, dbts );
-});
+	cb();
+}
 
-gulp.task('manifest',()=>
+function node_modules_task(cb)
 {
-	return gulp.src(['./manifest.json','./icon.png'])
+	gulp.parallel( ef_task, pu_task, diabetes_task );
+	cb();
+}
+
+function manifest_task(cb)
+{
+	console.log('Manifest');
+	gulp.src(['./manifest.json','./icon.png'])
 	.pipe(gulp.dest('./dist/') );
-});
+	cb();
+}
 
-gulp.task('html',()=>
+function html_task(cb)
 {
-	return gulp.src(['./popup.html'])
+	console.log('html_task');
+	gulp.src(['./popup.html'])
 		.pipe(gulp.dest('./dist/'));
-});
+	cb();
+}
 
-gulp.task('images',()=>
+function images_task(cb)
 {
-	return gulp.src(['images/*.png','*.png'])
+	console.log( 'images_task' );
+	gulp.src(['images/*.png','*.png'])
 	.pipe( gulp.dest('dist/images/') );
-});
+	cb();
+}
 
-gulp.task('css', function () {
+function css_task (cb) {
 
-	let sassStream = gulp
+	console.log('css_task');
+	gulp
     	.src('./css/*.css')
 		.pipe( gulp.dest('./dist/css/') );
+	cb();
+}
 
-});
 
-
-
-gulp.task('scripts', function()
+function script_task(cb)
 {
-	let dependencies =
-	[
-		,'./js/*.js'
-	];
+	console.log( 'script_task' );
+	let dependencies = [ './js/*.js' ];
 
-  	return gulp.src( dependencies )
+  	gulp.src( dependencies )
 		//.pipe(closureCompiler
 		//({
         //  compilation_level: 'ADVANCED_OPTIMIZATIONS'//'SIMPLE'
@@ -80,5 +98,21 @@ gulp.task('scripts', function()
         //}))
 		//.pipe(concat('app.min.js') )
     	.pipe(gulp.dest('./dist/js/'));
-});
+	cb();
+}
 
+gulp.task('script_task',script_task);
+gulp.task('css_task',css_task );
+gulp.task('html_task',html_task );
+gulp.task('images_task', images_task);
+gulp.task('manifest_task', manifest_task );
+gulp.task('node_modules_task',node_modules_task );
+gulp.task('watch_task',watch_task );
+
+exports.default = function(cb)
+{
+	console.log("Before");
+
+	return gulp.series( watch_task, html_task, css_task ,script_task ,images_task,manifest_task,node_modules_task);
+	//return gulp.parallel( 'html_task', 'css_task' ,'script_task' ,'images_task','manifest_task','node_modules_task');
+};
