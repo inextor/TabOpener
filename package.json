@@ -1,12 +1,13 @@
 {
   "dependencies": {
-    "del": "^3.0.0",
-    "diabetes": "^1.0.9",
-    "extension-framework": "^1.2.9",
-    "gulp": "^3.9.1",
+    "del": "^4.1.0",
+    "diabetes": "^1.0.10",
+    "extension-framework": "^2.1.5",
+    "gulp": "^4.0.1",
     "gulp-concat": "^2.6.1",
     "gulp-sass": "^4.0.2",
     "merge-stream": "^1.0.1",
-    "promiseutil": "^1.0.6"
+    "npm": "^6.9.0",
+    "promiseutils": "^0.1.9"
   }
 }
